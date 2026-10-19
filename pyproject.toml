@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lua-deobf"
+version = "1.0.0"
+description = "Rename obfuscated FiveM Lua variables (L0_1, A0_2, ...) to meaningful names, add comments, and verify the logic is unchanged"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+lua = ["lupa>=2.0"]
+
+[project.scripts]
+lua-deobf = "lua_deobf.cli:main"
+
+[tool.setuptools]
+packages = ["lua_deobf"]
