@@ -12,6 +12,18 @@
 
 No dependencies; Python 3.8+. Install `lupa` (optional) to also compile the output with a real Lua 5.4.
 
+## Windows: double-click `deobfuscate.bat`
+
+1. Install Python 3 from https://www.python.org/downloads/ and tick **"Add Python to PATH"** during setup.
+2. Run `deobfuscate.bat` in one of these ways:
+   * **drag** a folder or a `.lua` file onto `deobfuscate.bat`, or
+   * double-click it, then choose **1** to pick a folder in a dialog, or **2** to paste a folder/file path.
+3. Results:
+   * folder `C:\res\shop` → `C:\res\shop_deobf\` (same subfolders, every `.lua` processed, plus a `.report.md` per file)
+   * file `client.lua` → `client_deobf.lua` + `client_deobf.report.md` next to it
+
+   Explorer opens on the result automatically.
+
 ## Quick start
 
 ```bash
