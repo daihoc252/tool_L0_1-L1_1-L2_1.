@@ -99,6 +99,11 @@ def main(argv=None):
             print("%s: syntax error: %s" % (path, exc), file=sys.stderr)
             status = 1
             continue
+        except Exception as exc:     # keep going with the other files
+            print("%s: INTERNAL ERROR (%s: %s) - file skipped, please report it"
+                  % (path, type(exc).__name__, exc), file=sys.stderr)
+            status = 1
+            continue
         report = result.report(os.path.basename(path))
         text = report if args.markdown else result.code
         if args.output:

@@ -466,8 +466,10 @@ class Deobfuscator:
                 seg.add(3, "is" + pascal(short_event(ctx["event"])),
                         "set to true when event '%s' fires" % ctx["event"])
 
-    def value_hints(self, seg, d, scale, expr=None):
+    def value_hints(self, seg, d, scale, expr=None, depth=0):
         kind = d[0]
+        if depth > 6:
+            return          # self-referencing values such as `x = c and x`
 
         def add(weight, name, reason):
             seg.add(weight * scale, name, reason)
@@ -550,9 +552,9 @@ class Deobfuscator:
             elif op in _COMPARE:
                 add(1.5, "condition", "comparison")
             elif op in ("and", "or"):
-                self.value_hints(seg, self.desc(node.right), scale * 0.8)
+                self.value_hints(seg, self.desc(node.right), scale * 0.8, depth=depth + 1)
                 if op == "or":
-                    self.value_hints(seg, self.desc(node.left), scale * 0.8)
+                    self.value_hints(seg, self.desc(node.left), scale * 0.8, depth=depth + 1)
         elif kind == "unop":
             op, node = d[1], d[2]
             operand = self.desc(node.operand)

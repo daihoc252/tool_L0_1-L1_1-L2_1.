@@ -204,6 +204,10 @@ print(coords, L0_1, playerPed)
         renamed = self.dob(source, rename_globals=True)
         self.assertNotIn("L0_1", renamed)
 
+    def test_self_referencing_value(self):
+        code = self.dob("local L0_1 = nil\nwhile c do\n  L0_1 = x and L0_1\nend\nprint(L0_1)\n")
+        self.assertNotIn("L0_1", code)
+
     def test_custom_pattern(self):
         code = self.dob("local _0x1a2b = GetPlayerPed(-1)\nprint(_0x1a2b)\n", pattern=r"^_0x[0-9a-f]+$")
         self.assertIn("local playerPed = GetPlayerPed(-1)", code)
