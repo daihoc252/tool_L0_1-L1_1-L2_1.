@@ -73,8 +73,11 @@ explorer "%OUT%"
 goto end
 
 :failed
-echo   CO LOI xay ra - xem thong bao phia tren.
-echo   (VERIFICATION FAILED: khong nen dung file do; syntax error: file khong phai Lua hop le / la bytecode)
+echo   CO FILE BI LOI - xem danh sach "SUMMARY ... PROBLEM" ngay phia tren.
+echo   Danh sach nay cung duoc luu trong file _deobf_problems.txt o thu muc ket qua.
+echo   Cac file khac van duoc xu ly binh thuong.
+echo    - syntax error      : file khong phai Lua hop le, hoac la bytecode (can unluac truoc)
+echo    - VERIFICATION FAILED / INTERNAL ERROR : loi cua tool, hay gui file do cho nguoi phat trien
 goto end
 
 :not_found

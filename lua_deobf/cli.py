@@ -88,7 +88,7 @@ def main(argv=None):
         print("error: use -o FOLDER when processing several files", file=sys.stderr)
         return 2
     indent = "\t" if args.tabs else " " * args.indent
-    status = 0
+    failures = []      # (path, short reason)
     for path, rel in files:
         try:
             source = read_source(path)
@@ -97,12 +97,12 @@ def main(argv=None):
                                  check=not args.no_verify, rename_globals=args.rename_globals)
         except LuaSyntaxError as exc:
             print("%s: syntax error: %s" % (path, exc), file=sys.stderr)
-            status = 1
+            failures.append((path, "syntax error: %s" % exc))
             continue
         except Exception as exc:     # keep going with the other files
             print("%s: INTERNAL ERROR (%s: %s) - file skipped, please report it"
                   % (path, type(exc).__name__, exc), file=sys.stderr)
-            status = 1
+            failures.append((path, "internal error: %s: %s" % (type(exc).__name__, exc)))
             continue
         report = result.report(os.path.basename(path))
         text = report if args.markdown else result.code
@@ -126,7 +126,7 @@ def main(argv=None):
             write(report_path, report)
         v = result.verification
         if v is not None and not v.ok:
-            status = 1
+            failures.append((path, "VERIFICATION FAILED (output written, but do not use it)"))
             print("%s: VERIFICATION FAILED - output may not be equivalent:" % path, file=sys.stderr)
             for problem in v.problems:
                 print("  " + problem, file=sys.stderr)
@@ -137,4 +137,21 @@ def main(argv=None):
             print("%s: renamed %d variables (%s side), verification %s%s" % (
                 path, len(result.renames), result.summary.side, check,
                 (" -> " + target) if target else ""), file=sys.stderr)
-    return status
+    if len(files) > 1 or failures:
+        print_summary(files, failures, args.output if many else None)
+    return 1 if failures else 0
+
+
+def print_summary(files, failures, output_folder):
+    lines = ["", "=" * 70,
+             "SUMMARY: %d file(s), %d OK, %d with problems"
+             % (len(files), len(files) - len(failures), len(failures))]
+    for path, reason in failures:
+        lines.append("  PROBLEM: %s" % path)
+        lines.append("           %s" % reason)
+    lines.append("=" * 70)
+    print("\n".join(lines), file=sys.stderr)
+    if failures and output_folder:
+        log = os.path.join(output_folder, "_deobf_problems.txt")
+        write(log, "\n".join(lines[1:]) + "\n")
+        print("(this list was also saved to %s)" % log, file=sys.stderr)
